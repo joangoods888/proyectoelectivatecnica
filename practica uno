@@ -1,0 +1,108 @@
+///PRACTICA 1,RECOLECCION DE SEÑALES ANALOGICAS,JOAN DAVID BARRERA Y JHONATAN ORTIZ
+///INGENIERIA ELECTROMECANICA UPTC, ELECTIVA TECNICA I, MICROCONTROLADORES//
+///El codigo consiste en leer señales analogicas con analogRead y
+///mostrar en monitor serial, voltaje, señal adc y porcentaje voltaje.//
+
+
+unsigned long leepin = 0;  // lee para potenciometro
+unsigned long leeldr = 0;  // lee para ldr
+///voltajes//
+float voltajepot = 0; 
+float voltajeldr = 0; 
+///porcentajes//
+unsigned long porcentajepot; //para calcular porcentajes
+unsigned long porcentajeldr;
+
+///define pines analogos//
+#define potpin A0
+#define ldrpin A1
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(potpin, INPUT); //por consiguiente, son entradas
+  pinMode(ldrpin, INPUT);
+}
+
+void loop() {
+  leepin = analogRead(potpin); //captura los valores de 10 bits
+  leeldr = analogRead(ldrpin);
+  
+///////////potenciometro////////////
+  Serial.print("A0:POT [ADC ");
+
+  if (leepin < 1000) { //condicional para que sea uniforme el formato
+    Serial.print("0");  //"0000"//
+  }
+
+  else if (leepin < 100) { //se añaden ceros respectivamente
+    Serial.print("0");
+  }
+
+  if (leepin < 10) {
+    Serial.print("0");
+  }
+
+  if (leepin == 0) {
+
+    Serial.print("0");
+  }
+
+  Serial.print(leepin);
+  Serial.print("] ");
+  voltajepot = 0.0048828125 * leepin; //captura calculo de voltaje 
+  Serial.print(voltajepot); //muestra valor de voltaje
+
+  Serial.print("V ");
+  porcentajepot = 100 * leepin / 1023; //calculo del porcentaje
+  if (porcentajepot < 100) { //se adapta formato de "000"
+    Serial.print("0");
+  }
+  else if (porcentajepot < 10) {
+    Serial.print("00");
+  }
+  if (porcentajepot == 0) {
+    Serial.print("0");
+  }
+
+
+  Serial.print(porcentajepot);
+
+  Serial.print("% ");
+
+ ///////////fotoresistor//////////
+  Serial.print("A1:LDR [ADC ");
+  if (leeldr < 1000) {
+    Serial.print("0");
+  }
+  else if (leeldr < 100) {
+    Serial.print("0");
+  }
+  if (leeldr < 10) {
+    Serial.print("0");
+  }
+  if (leeldr == 0) {
+    Serial.print("0");
+  }
+  Serial.print(leeldr);
+  Serial.print("]");
+  voltajeldr = 0.0048828125 * leeldr; //
+  Serial.print(voltajeldr);
+  Serial.print("V ");
+  porcentajeldr = 100 * leeldr / 1023;
+  if (porcentajeldr < 100) {
+    Serial.print("0");
+  }
+  else if (porcentajeldr < 10) {
+    Serial.print("00");
+  }
+  if (porcentajeldr == 0) {
+    Serial.print("0");
+  }
+
+
+  Serial.print(porcentajeldr);
+
+  Serial.println("% ");
+
+  delay(200); //captura la info. 5 veces por segundo.
+}
