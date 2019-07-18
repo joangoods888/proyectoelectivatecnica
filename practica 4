@@ -1,0 +1,83 @@
+///PRACTICA 4, ATENCION DE SEÑALES DE EMERGENCIA, JOAN DAVID BARRERA Y JHONATAN ORTIZ,
+///INGENIERIA ELECTROMECANICA UPTC, ELECTIVA TECNICA I, MICROCONTROLADORES//
+///El codigo consiste en leer señales analogicas con analogRead y
+///mostrar en monitor serial, voltaje, señal adc y porcentaje voltaje con una
+///variante, uso de un interruptor para apagar el sistema de control por 
+///10 segundos, y durante ese tiempo encender un buzzer(chicharra).
+
+
+
+unsigned int escribemotled = 0; 
+unsigned long ldrlee = 0;
+float voltajeldr = 0;
+
+//// e y s////
+#define ldr A0 //entrada fotointerruptor
+#define motled 11 //salida motor led
+int pulsador = 2;//entrada para interrupcion
+int buzz = 4; //salida buzzer
+
+bool  estado = false; //bandera en 0 logico
+//volatile se requiere para las interrupciones
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  attachInterrupt(digitalPinToInterrupt(2), sensor, RISING);//flanco de subida
+  pinMode(buzz, OUTPUT);
+  digitalWrite(buzz, estado);
+  pinMode(motled, OUTPUT);
+  pinMode(ldr, INPUT);
+
+}
+
+void loop() {
+  digitalWrite(buzz, estado); 
+
+  ldrlee = analogRead(ldr);
+  voltajeldr = 0.0048828125 * ldrlee;
+  escribemotled = ldrlee / 4;
+  analogWrite(motled, escribemotled);
+  Serial.print("|led o motor ON| value: ");
+  Serial.print(escribemotled);
+  Serial.print("| ");
+  Serial.print(voltajeldr);
+  Serial.print("Volts| ");
+  Serial.print("flag state:");
+  Serial.print(estado);
+  Serial.println("|");
+  delay(200);
+  if (estado == true) {
+    escribemotled = 0;
+    analogWrite(motled, escribemotled);
+    Serial.print("|led o motor OFF| value: ");
+
+    Serial.print(escribemotled);//valor analogico dac
+    Serial.print("| ");
+    Serial.println("motor o led apagado, parada de emergencia!");
+    Serial.println("faltan:");
+    for (int i = 10; i > 0; i--) { //conteo regresivo
+      delay(1000);
+      digitalWrite(buzz, estado);
+
+      Serial.print(i);
+      Serial.println(" segundos");
+    }
+    Serial.println("motor o led funcionando");
+    estado = false; //el estado se convierte en cero para atender otra 
+    //            rutina futura
+
+  }
+}
+
+
+void sensor() { //atencion de la rutina, interrupcion activada
+
+  Serial.print("|Interrupcion activada!|");
+  Serial.print("flag state: ");
+  estado = !estado; //cambio de valor de la bandera
+  Serial.print(estado);
+  Serial.println("|");
+
+
+
+}
