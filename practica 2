@@ -1,0 +1,120 @@
+///PRACTICA 2, EMISION DE SEÑALES ANALOGICAS, JOAN DAVID BARRERA Y JHONATAN ORTIZ,
+///INGENIERIA ELECTROMECANICA UPTC, ELECTIVA TECNICA I, MICROCONTROLADORES//
+///El codigo consiste en hacer un "DAC" mediante el uso del monitor serial//
+///por medio de cadenas(SerialreadString)en donde se haga transmision y recepcion
+///de datos, enviando mensajes para controlar las velocidades e intensidades, y
+///añadiendo off y on, y por consiguiente se recibe el estado en AnalogWrite y
+///su porcentaje en terminos de voltaje
+///de salida,(variador de velocidad motor, y dimerizar leds)//
+
+
+int porcentajeled = 0; //porcentaje de luminosidad
+String leepuerto;   //para enviar mensajes de cadenas
+float a = 0, b = 25.5, c = 0; //a:valor de analogwrite, float para aproximar
+
+#define ledpin 11 //salida
+
+
+
+void setup() {
+  Serial.begin(9600);
+  Serial.println("//bienvenido\\\\");
+  Serial.println("");
+  Serial.println("//digite 'subir'\\\\");
+  Serial.println(" subira la intensidad un 10%");
+  Serial.println("");
+  Serial.println("//digite 'bajar'\\\\");
+  Serial.println(" bajara la intensidad un 10%");
+  Serial.println("");
+  Serial.println("//digite 'off'\\\\");
+  Serial.println("apagara led o moto\r");
+  Serial.println("");
+  Serial.println("//digite 'on'\\\\");
+  Serial.println("encendera led o motor");
+  pinMode(ledpin, OUTPUT);
+}
+
+void loop() {
+  //porcentajeled = 100 * a / 255; //intensidad luminica o velocidad
+  c = a + b;
+
+
+
+  delay(500);
+
+
+
+  if (Serial.available() > 0) {  //espera lo que le ingrese
+    leepuerto = Serial.readString(); //variable string
+
+    if (leepuerto == "subir"  || leepuerto == "Subir" || leepuerto == "SUBIR") {
+
+      Serial.print("subiendo intensidad |");
+
+      for (a = a; a < c; a++) {
+        analogWrite(ledpin, a);
+        delay(25);
+        if (a > 254) {  //hasta 255
+          break;     //ya no me interesa el for
+
+        }
+      }
+      Serial.print(a);
+      Serial.print("|");
+      porcentajeled = 100 * a / 255; //intensidad luminica o velocidad
+      Serial.print(porcentajeled);
+      Serial.println("%|");
+    }
+    else {
+    }
+
+    if (leepuerto == "bajar" || leepuerto == "Bajar"  || leepuerto == "BAJAR" ) {
+
+      if (a >= 26) { //26 para que no cuente valores inferiores a 0
+        Serial.print("bajando intensidad |");
+        a = a - 26;
+        analogWrite(ledpin, a);
+      }
+      Serial.print(a);
+      Serial.print("|");
+      porcentajeled = 100 * a / 255; //intensidad luminica o velocidad
+      Serial.print(porcentajeled);
+      Serial.println("%|");
+
+    }
+    else {
+    }
+
+    if (leepuerto == "on" || leepuerto == "ON" || leepuerto == "On" ) {
+
+      a = 255;
+
+      analogWrite(ledpin, a);
+      Serial.print("maxima intensidad |");
+      Serial.print(a);
+      Serial.print("|");
+      porcentajeled = 100 * a / 255; //intensidad luminica o velocidad
+      Serial.print(porcentajeled);
+      Serial.println("%|");
+    }
+
+    else {
+    }
+
+    if (leepuerto == "off" || leepuerto == "OFF" || leepuerto == "Off" ) {
+
+      a = 0;
+
+
+      Serial.print("intensidad cero |");
+      analogWrite(ledpin, a);
+      Serial.print("|");
+      porcentajeled = 100 * a / 255; //intensidad luminica o velocidad
+      Serial.print(porcentajeled);
+      Serial.println("%|");
+    }
+
+
+
+  }
+}
