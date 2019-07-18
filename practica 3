@@ -1,0 +1,37 @@
+///PRACTICA 3, SISTEMA DE CONTROL SIMPLE, JOAN DAVID BARRERA Y JHONATAN ORTIZ,
+///INGENIERIA ELECTROMECANICA UPTC, ELECTIVA TECNICA I, MICROCONTROLADORES//
+///El codigo consiste en hacer un "DAC" mediante el uso de analogRead y 
+///analogWrite, traduciendo las señales analogicas en valores de 10 bits
+///y convertir en valores de 8 bits(analogWrite), que controlen el voltaje
+///de salida,(variador de velocidad motor, y dimerizar leds)//
+
+unsigned int escribemotled = 0; //captura los valores de analogWrite
+unsigned long ldrlee = 0;
+float voltajeldr = 0;
+
+#define ldr A0 
+#define motled 3 //salida del motor o led
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(motled, OUTPUT); //definimos e-s
+  pinMode(ldr, INPUT);
+
+
+
+}
+
+void loop() {
+  ldrlee = analogRead(ldr); //captura 10 bits
+  voltajeldr = 0.0048828125 * ldrlee;
+  escribemotled = ldrlee / 4; //convierte a 8 bits
+  analogWrite(motled, escribemotled); //pin,variable
+  Serial.print("led o motor ON| ");
+  Serial.print(escribemotled);
+  Serial.print("| ");
+  Serial.print(voltajeldr);
+  Serial.println("Volts| ");
+  delay(200); //retardo en monitor serial
+
+
+}
